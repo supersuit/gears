@@ -92,14 +92,15 @@ var world_Gridyard = new function() {
     wallColor: 'B3B3B3'
   });
 
-  // Yard features. Units are cm, origin at the center, floor at y = 0.
+  // Yard features. Units are cm, origin at the center, floor at height 0.
+  // World positions are [x, z, height], matching the other worlds (for example Football).
   // Boxes use size [width along x, depth along z, height] and a center position.
   var wallColor = '#B3B3B3';
 
   function box(x, z, w, d, h, color) {
     return {
       type: 'box',
-      position: [x, h / 2, z],
+      position: [x, z, h / 2],
       size: [w, d, h],
       color: color,
       physicsOptions: 'fixed'
@@ -119,7 +120,7 @@ var world_Gridyard = new function() {
   function boxAt(x, y, z, w, d, h, color) {
     return {
       type: 'box',
-      position: [x, y, z],
+      position: [x, z, y],
       size: [w, d, h],
       color: color,
       physicsOptions: 'fixed'
@@ -131,7 +132,7 @@ var world_Gridyard = new function() {
   function pad(x, z, w, d, textureURL) {
     return {
       type: 'box',
-      position: [x, 0.5, z],
+      position: [x, z, 0.5],
       size: [w, d, 1],
       color: '#FFFFFF',
       imageType: 'top',
