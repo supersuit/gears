@@ -11,7 +11,7 @@
   },
   "kv_namespaces": [
     // Create with: npx wrangler kv namespace create GEARS_STATE, then paste the id here.
-    { "binding": "GEARS_STATE", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }
+    { "binding": "GEARS_STATE", "id": "17fdce14b4494756bb93bb8da663ec1c" }
   ],
   "vars": {
     // Set the real addresses here or in the dashboard.
