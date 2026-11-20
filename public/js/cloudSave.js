@@ -8,12 +8,19 @@ var cloudSave = new function() {
     return new URLSearchParams(window.location.search).get('token') || '';
   };
 
+  // The world builder's custom layout is kept separately, so it survives
+  // switching to another world.
+  this.findCustomWorld = function() {
+    return worlds.find(function(w) { return w.name == 'custom'; });
+  };
+
   this.collect = function() {
     return {
       version: 1,
       blocks: blockly.getXmlText(),
       robot: robot.options,
       world: babylon.world ? {worldName: babylon.world.name, options: babylon.world.options} : null,
+      customWorld: self.findCustomWorld() ? self.findCustomWorld().options : null,
       savedAt: new Date().toISOString()
     };
   };
@@ -56,6 +63,15 @@ var cloudSave = new function() {
     }
 
     let state = await response.json();
+    if (state.customWorld) {
+      let custom = self.findCustomWorld();
+      if (custom) {
+        custom.options = state.customWorld;
+        if (typeof custom.setOptions == 'function') {
+          custom.setOptions(state.customWorld);
+        }
+      }
+    }
     if (state.blocks) {
       blockly.loadXmlText(state.blocks);
     }
