@@ -83,7 +83,7 @@ var world_Gridyard = new function() {
   ];
 
   this.defaultOptions = Object.assign(this.defaultOptions, {
-    imageURL: 'textures/maps/grid.png',
+    imageURL: 'textures/maps/proving_ground_concrete.png',
     imageScale: '2.353',
     length: 2000,
     width: 2000,
