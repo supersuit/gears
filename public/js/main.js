@@ -486,10 +486,72 @@ var main = new function() {
         {html: i18n.get('#main-load_python#'), line: false, callback: self.loadPythonFromComputer},
         {html: i18n.get('#main-save_python#'), line: true, callback: self.savePythonToComputer},
         {html: i18n.get('#main-export_zip#'), line: false, callback: self.saveZipToComputer},
+        {html: 'Submit to Coach', line: false, callback: self.submitToCoach},
+        {html: 'Save to Cloud', line: false, callback: cloudSave.save},
         {html: i18n.get('#main-import_zip#'), line: false, callback: self.loadZipFromComputer}
       ];
 
       menuDropDown(self.$fileMenu, menuItems, {className: 'fileMenuDropDown'});
+    }
+  };
+
+  // Email the project and world to the coach through the submit function
+  this.submitToCoach = async function() {
+    let projectName = self.$projectName.val();
+    if (projectName.trim() == '') {
+      projectName = 'gearsBot';
+    }
+
+    let studentName = window.prompt('Your name (optional, so your coach knows who sent it):', '');
+    if (studentName === null) {
+      return;
+    }
+
+    let meta = {
+      name: projectName,
+      pythonModified: filesManager.modified
+    };
+
+    let zip = new JSZip();
+    zip.file('gearsBlocks.xml', blockly.getXmlText());
+    if (filesManager.modified) {
+      for (let filename in filesManager.files) {
+        zip.file(filename, filesManager.files[filename]);
+      };
+    } else {
+      zip.file('main.py', blockly.generator.genCode());
+    }
+    zip.file('gearsRobot.json', JSON.stringify(robot.options, null, 2));
+    if (babylon.world) {
+      zip.file('world.json', JSON.stringify({
+        worldName: babylon.world.name,
+        options: babylon.world.options
+      }, null, 2));
+    }
+    zip.file('meta.json', JSON.stringify(meta, null, 2));
+
+    let zipBase64 = await zip.generateAsync({type: 'base64', compression: 'DEFLATE'});
+
+    let response;
+    try {
+      response = await fetch('/.netlify/functions/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          studentName: studentName,
+          projectName: projectName,
+          zipBase64: zipBase64
+        })
+      });
+    } catch (err) {
+      window.alert('Could not reach the server. Use Export Zip to save your project and try again later.');
+      return;
+    }
+
+    if (response.ok) {
+      window.alert('Sent to your coach.');
+    } else {
+      window.alert('Submission failed (' + response.status + '). Use Export Zip to save your project and try again.');
     }
   };
 
