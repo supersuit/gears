@@ -83,7 +83,7 @@ var world_Gridyard = new function() {
   ];
 
   this.defaultOptions = Object.assign(this.defaultOptions, {
-    imageURL: 'textures/maps/proving_ground_concrete.png',
+    imageURL: 'textures/maps/proving_ground_grass.png',
     imageScale: '2.353',
     length: 2000,
     width: 2000,
@@ -126,8 +126,36 @@ var world_Gridyard = new function() {
     };
   }
 
+  // Ground pad with its own texture, sitting just above the floor.
+  // Textures tile every 20 cm, the same as the floor.
+  function pad(x, z, w, d, textureURL) {
+    return {
+      type: 'box',
+      position: [x, 0.5, z],
+      size: [w, d, 1],
+      color: '#FFFFFF',
+      imageType: 'top',
+      imageURL: textureURL,
+      uScale: w / 20,
+      vScale: d / 20,
+      physicsOptions: 'fixed'
+    };
+  }
+  var ASPHALT = 'textures/maps/proving_ground_asphalt.png';
+  var CONCRETE = 'textures/maps/proving_ground_concrete.png';
+  var GRAVEL = 'textures/maps/proving_ground_gravel.png';
+
   this.buildYardObjects = function() {
     let objects = [];
+
+    // Ground pads first so everything else sits on top of them
+    objects.push(pad(-500, -400, 800, 60, ASPHALT));          // airstrip runway
+    objects.push(pad(-600, 700, 600, 400, ASPHALT));          // parking lot
+    objects.push(pad(0, 250, 500, 350, ASPHALT));             // test track
+    objects.push(pad(0, -500, 200, 800, CONCRETE));           // road from gate to lab
+    objects.push(pad(400, -50, 600, 100, CONCRETE));          // plaza in front of lab
+    objects.push(pad(400, -300, 560, 360, CONCRETE));         // lab floor
+    objects.push(pad(700, 700, 400, 400, GRAVEL));            // parts yard ground
 
     // Lab building with a doorway on its south side
     objects.push(box(400, -500, 600, 20, 150, wallColor));    // north
@@ -136,8 +164,7 @@ var world_Gridyard = new function() {
     objects.push(box(220, -100, 240, 20, 150, wallColor));    // south, left of door
     objects.push(box(580, -100, 240, 20, 150, wallColor));    // south, right of door
 
-    // Parking lot with stall lines
-    objects.push(box(-600, 700, 600, 400, 1, '#4A4A4A'));
+    // Parking stall lines
     for (let i = 0; i < 5; i++) {
       objects.push(box(-800 + i * 100, 700, 4, 150, 1, '#FFFFFF'));
     }
@@ -167,15 +194,13 @@ var world_Gridyard = new function() {
     objects.push(boxAt(0, 105, -960, 340, 4, 60, '#14213D'));   // sign board
     objects.push(boxAt(0, 75, -960, 340, 4, 6, '#FEC627'));     // yellow trim
 
-    // Airstrip: 800 cm runway in the west with center dashes
-    objects.push(box(-500, -400, 800, 60, 1, '#3A3A3A'));
+    // Airstrip center dashes
     for (let i = 0; i < 7; i++) {
       objects.push(box(-850 + i * 100, -400, 40, 3, 1, '#FFFFFF'));
     }
 
-    // Test track: asphalt pad with a barrier loop and two chicane blocks
+    // Test track barrier loop and two chicane blocks
     let tx = 0, tz = 250;
-    objects.push(box(tx, tz, 500, 350, 1, '#4A4A4A'));                  // pad
     objects.push(box(tx, tz - 175, 500, 10, 15, '#FF6B1A'));            // north barrier
     objects.push(box(tx, tz + 175, 500, 10, 15, '#FF6B1A'));            // south barrier
     objects.push(box(tx - 250, tz, 10, 350, 15, '#FF6B1A'));            // west barrier
