@@ -136,6 +136,24 @@ var world_Gridyard = new function() {
     };
   }
 
+  // Flat sign panel lying on a roof. The texture shows on the top face.
+  function roofSign(x, z, w, d, h, textureURL) {
+    return {
+      type: 'box',
+      position: [x * S, z * S, (h + 0.5) * S],
+      size: [w * S, d * S, 1 * S],
+      color: '#FFFFFF',
+      imageType: 'top',
+      imageURL: textureURL,
+      uScale: 1,
+      vScale: 1,
+      physicsOptions: false
+    };
+  }
+  var SIGN_TORQUE = 'textures/signs/torque_tacos.png';
+  var SIGN_RELAY = 'textures/signs/relay_burgers.png';
+  var SIGN_UNI = 'textures/signs/gridyard_university.png';
+
   // Traffic cone (small orange block)
   function cone(x, z) {
     return box(x, z, 8, 8, 12, '#FF8C00');
@@ -277,6 +295,22 @@ var world_Gridyard = new function() {
       add(box(120, z, 6, 6, 100, '#555555'));
       add(boxAt(120, 100, z, 12, 12, 4, '#FFEE88'));
     });
+
+    // ---- Restaurant row, east of the test track ----
+    add(box(400, 180, 120, 80, 50, '#C8B89A'));               // Torque Tacos
+    add(roofSign(400, 180, 100, 60, 50, SIGN_TORQUE));
+    add(box(400, 330, 120, 80, 50, '#B9C4CF'));               // Relay Burgers
+    add(roofSign(400, 330, 100, 60, 50, SIGN_RELAY));
+    add(box(400, 255, 8, 8, 20, '#555555'));                  // walkway post
+    add(box(400, 405, 8, 8, 20, '#555555'));
+
+    // ---- University building, west of the test track ----
+    add(box(-420, 0, 260, 180, 80, '#D9D2C3'));               // main building
+    add(roofSign(-420, 0, 220, 140, 80, SIGN_UNI));
+    for (let i = 0; i < 4; i++) {
+      add(box(-520 + i * 65, -100, 10, 10, 80, '#FFFFFF'));   // front columns
+    }
+    add(box(-420, -110, 120, 20, 4, '#8B5E3C'));              // entrance steps
 
     return objects;
   };
