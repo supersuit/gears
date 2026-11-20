@@ -1,18 +1,20 @@
 // Saves and restores one student's GEARS progress (blocks, robot, world).
 // Each request must carry a token: "<studentId>.<HMAC-SHA256 of studentId>",
-// signed with STATE_SECRET. The student ID is taken from the token, so a
+// signed with STATE_SECRET. The student ID comes from the token, so a
 // student can only read or write their own save.
 //
 // Required environment variable (set in Netlify): STATE_SECRET
 
-const crypto = require('crypto');
-const {getStore} = require('@netlify/blobs');
+import crypto from 'node:crypto';
+import {getStore} from '@netlify/blobs';
 
 const MAX_BODY_CHARS = 1024 * 1024;
-const JSON_HEADERS = {'Content-Type': 'application/json'};
 
-function reply(statusCode, body) {
-  return {statusCode: statusCode, headers: JSON_HEADERS, body: JSON.stringify(body)};
+function reply(status, body) {
+  return new Response(JSON.stringify(body), {
+    status: status,
+    headers: {'Content-Type': 'application/json'}
+  });
 }
 
 function studentFromAuth(authHeader) {
@@ -37,20 +39,19 @@ function studentFromAuth(authHeader) {
   return studentId;
 }
 
-exports.handler = async function(event) {
+export default async function(req) {
   if (!process.env.STATE_SECRET) {
     return reply(500, {error: 'Saving is not configured'});
   }
 
-  const headers = event.headers || {};
-  const studentId = studentFromAuth(headers.authorization || headers.Authorization);
+  const studentId = studentFromAuth(req.headers.get('authorization'));
   if (!studentId) {
     return reply(401, {error: 'Invalid or missing token'});
   }
 
   const store = getStore('gears-state');
 
-  if (event.httpMethod === 'GET') {
+  if (req.method === 'GET') {
     const state = await store.get(studentId, {type: 'json'});
     if (state === null) {
       return reply(404, {error: 'No saved state yet'});
@@ -58,8 +59,8 @@ exports.handler = async function(event) {
     return reply(200, state);
   }
 
-  if (event.httpMethod === 'PUT') {
-    const body = event.body || '';
+  if (req.method === 'PUT') {
+    const body = await req.text();
     if (body.length > MAX_BODY_CHARS) {
       return reply(413, {error: 'Save is too large'});
     }
@@ -77,4 +78,4 @@ exports.handler = async function(event) {
   }
 
   return reply(405, {error: 'GET or PUT only'});
-};
+}
