@@ -8,9 +8,9 @@ var world_Gridyard = new function() {
   var self = this;
 
   this.name = 'gridyard';
-  this.shortDescription = 'Gridyard (large grid)';
+  this.shortDescription = 'The Proving Ground';
   this.longDescription =
-    '<p>A large grid yard for long drives and big courses.</p>' +
+    '<p>The Proving Ground: a large grid yard with a lab, parking, a parts yard, an airstrip and a test track.</p>' +
     '<p>Each large square is 20cm, while each small square is 5cm.</p>';
   this.thumbnail = 'images/worlds/grid.jpg';
 
@@ -115,12 +115,22 @@ var world_Gridyard = new function() {
     };
   }
 
+  // Box with an explicit center height, for signs and anything floating
+  function boxAt(x, y, z, w, d, h, color) {
+    return {
+      type: 'box',
+      position: [x, y, z],
+      size: [w, d, h],
+      color: color,
+      physicsOptions: 'fixed'
+    };
+  }
+
   this.buildYardObjects = function() {
     let objects = [];
 
     // Lab building with a doorway on its south side
-    let labX = 400, labZ = -300;
-    objects.push(box(labX, -500, 600, 20, 150, wallColor));   // north
+    objects.push(box(400, -500, 600, 20, 150, wallColor));    // north
     objects.push(box(100, -300, 20, 400, 150, wallColor));    // west
     objects.push(box(700, -300, 20, 400, 150, wallColor));    // east
     objects.push(box(220, -100, 240, 20, 150, wallColor));    // south, left of door
@@ -149,6 +159,29 @@ var world_Gridyard = new function() {
     objects.push(box(-100, -900, 30, 30, 120, '#FEC627'));
     objects.push(box(100, -900, 30, 30, 120, '#FEC627'));
     objects.push(box(0, -900, 170, 10, 25, '#FEC627'));
+
+    // Entry sign just inside the gate: navy board, yellow trim, on two posts.
+    // The name is not printed on it yet; that needs a texture image.
+    objects.push(boxAt(-150, 60, -960, 6, 6, 120, '#14213D'));  // left post
+    objects.push(boxAt(150, 60, -960, 6, 6, 120, '#14213D'));   // right post
+    objects.push(boxAt(0, 105, -960, 340, 4, 60, '#14213D'));   // sign board
+    objects.push(boxAt(0, 75, -960, 340, 4, 6, '#FEC627'));     // yellow trim
+
+    // Airstrip: 800 cm runway in the west with center dashes
+    objects.push(box(-500, -400, 800, 60, 1, '#3A3A3A'));
+    for (let i = 0; i < 7; i++) {
+      objects.push(box(-850 + i * 100, -400, 40, 3, 1, '#FFFFFF'));
+    }
+
+    // Test track: asphalt pad with a barrier loop and two chicane blocks
+    let tx = 0, tz = 250;
+    objects.push(box(tx, tz, 500, 350, 1, '#4A4A4A'));                  // pad
+    objects.push(box(tx, tz - 175, 500, 10, 15, '#FF6B1A'));            // north barrier
+    objects.push(box(tx, tz + 175, 500, 10, 15, '#FF6B1A'));            // south barrier
+    objects.push(box(tx - 250, tz, 10, 350, 15, '#FF6B1A'));            // west barrier
+    objects.push(box(tx + 250, tz, 10, 350, 15, '#FF6B1A'));            // east barrier
+    objects.push(box(tx - 80, tz - 40, 20, 80, 10, '#FF6B1A'));         // chicane block 1
+    objects.push(box(tx + 80, tz + 40, 20, 80, 10, '#FF6B1A'));         // chicane block 2
 
     return objects;
   };
