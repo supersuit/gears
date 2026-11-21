@@ -54,7 +54,8 @@ async function studentFromAuth(authHeader, secret) {
   if (!/^[A-Za-z0-9_-]{1,100}$/.test(studentId)) {
     return null;
   }
-  const expected = await hmacHex(secret, studentId);
+  // Short signature (8 hex chars) so links stay easy to share.
+  const expected = (await hmacHex(secret, studentId)).slice(0, 8);
   return sameText(token.slice(dot + 1), expected) ? studentId : null;
 }
 
