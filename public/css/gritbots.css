@@ -1,0 +1,26 @@
+/* GritBots theme: navy header with yellow accents (brand yellow #FEC627). */
+:root {
+  --gritbots-yellow: #FEC627;
+  --gritbots-navy: #14213D;
+}
+
+header {
+  background: var(--gritbots-navy);
+  color: #ffffff;
+  border-bottom: 3px solid var(--gritbots-yellow);
+}
+
+header .gearsIcon {
+  filter: drop-shadow(0 0 1px #000);
+}
+
+nav li.active,
+nav .active {
+  border-bottom-color: var(--gritbots-yellow);
+}
+
+button,
+.button {
+  background: var(--gritbots-yellow);
+  color: var(--gritbots-navy);
+}

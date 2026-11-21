@@ -5,7 +5,7 @@ var babylon = new function() {
   this.ENABLE_ANTIALIASING = false;
   // this.ENABLE_ANTIALIASING = true;
 
-  this.world = worlds[0];
+  this.world = worlds.find(function(w){ return w.name == 'gridyard'; }) || worlds[0];
 
   // Run on page load
   this.init = function() {

@@ -895,7 +895,7 @@ var main = new function() {
   this.showWhatsNew = function(forceShow=false) {
     let current = 20261116;
     let lastShown = localStorage.getItem('whatsNew');
-    if (lastShown == null || parseInt(lastShown) < current || forceShow) {
+    if (forceShow) {
       let options = {
         title: 'What\'s New',
         message:
