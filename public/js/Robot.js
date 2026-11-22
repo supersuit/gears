@@ -143,6 +143,45 @@ function Robot() {
       body.rotate(BABYLON.Axis.X, startRot.x, BABYLON.Space.LOCAL);
       body.rotate(BABYLON.Axis.Z, startRot.z, BABYLON.Space.LOCAL);
 
+      // Visual details (no physics): a head unit, two eyes, and a front bumper.
+      // Parented to the body so they move and turn with it.
+      (function addRobotDetails() {
+        var W = options.bodyWidth, H = options.bodyHeight, L = options.bodyLength;
+
+        var headMat = bodyMat;
+        var darkMat = new BABYLON.StandardMaterial('robotDark', scene);
+        darkMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.17);
+        darkMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+        darkMat.freeze();
+        var eyeMat = new BABYLON.StandardMaterial('robotEye', scene);
+        eyeMat.diffuseColor = new BABYLON.Color3(0.1, 0.8, 1.0);
+        eyeMat.emissiveColor = new BABYLON.Color3(0.1, 0.5, 0.7);
+        eyeMat.freeze();
+
+        var headW = W * 0.6, headH = H * 0.45, headD = L * 0.4;
+        var headZ = L * 0.15;
+        var head = BABYLON.MeshBuilder.CreateBox('robotHead', { width: headW, height: headH, depth: headD }, scene);
+        head.material = headMat;
+        head.position.set(0, H / 2 + headH / 2, headZ);
+        head.parent = body;
+
+        var eyeD = headH * 0.6;
+        [-1, 1].forEach(function(side) {
+          var eye = BABYLON.MeshBuilder.CreateCylinder('robotEye', { height: 0.2, diameter: eyeD, tessellation: 16 }, scene);
+          eye.rotation.x = Math.PI / 2;
+          eye.material = eyeMat;
+          eye.position.set(side * headW * 0.22, H / 2 + headH / 2, headZ + headD / 2 + 0.05);
+          eye.parent = body;
+        });
+
+        var bumper = BABYLON.MeshBuilder.CreateBox('robotBumper', { width: W * 1.02, height: H * 0.18, depth: 0.2 }, scene);
+        bumper.material = darkMat;
+        bumper.position.set(0, -H * 0.3, L / 2 + 0.1);
+        bumper.parent = body;
+
+        scene.shadowGenerator.addShadowCaster(head);
+      })();
+
       // Add label
       self.addLabel();
 
